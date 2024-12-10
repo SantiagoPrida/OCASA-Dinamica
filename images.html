@@ -150,24 +150,15 @@
       }
 
       // Solución 5: Usar dom-to-image para manejar imágenes contaminadas
-      function generateQRWithDomToImage() {
-        domtoimage.toBlob(document.getElementById("containerToCanvas"))
-          .then((blob) => {
-            const dataURL = URL.createObjectURL(blob);
-            createQRCode(dataURL);
-          })
-          .catch((error) => {
-            console.error("Error al generar el QR con dom-to-image:", error);
-            // Manejo de error más detallado
-            if (error.message.includes("Network Error")) {
-              alert(
-                "No se pudo cargar un recurso. Verifica tu conexión o los permisos de CORS del servidor."
-              );
-            } else {
-              alert("Ocurrió un error inesperado.");
-            }
-          });
-      }
+      function generateQRWithHtml2Canvas() {
+    html2canvas(document.getElementById("containerToCanvas")).then(function (canvas) {
+        const dataURL = canvas.toDataURL("image/png");
+        createQRCode(dataURL);
+    }).catch(function (error) {
+        console.error("Error al generar el QR con html2canvas:", error);
+        alert(`Hubo un problema al generar el QR con html2canvas. Verifica que el contenido en el contenedor sea accesible.\nError: ${error.message}`);
+    });
+}
 
       function createQRCode(url) {
         new QRCode(document.getElementById("qrcode"), {
@@ -182,8 +173,9 @@
       }
 
       // Ejecutar la solución deseada:
-      // generateQRWithHiddenImages(); // Usar con html2canvas
-      generateQRWithDomToImage(); // Usar con dom-to-image
+      generateQRWithHiddenImages(); // Usar con html2canvas
+    //   generateQRWithDomToImage(); // Usar con dom-to-image
+    //   generateQRWithHtml2Canvas();
     </script>
   </body>
 </html>
