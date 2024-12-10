@@ -1,202 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OCASA</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
-        * {
-            font-family: 'Montserrat', sans-serif;
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+      * {
+        font-family: "Montserrat", sans-serif;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-        .container {
-            display: grid;
-            grid-template-rows: 1fr 10vh;
-            width: 100%;
-        }
+      .container {
+        display: grid;
+        grid-template-rows: 1fr 10vh;
+        width: 100%;
+      }
 
-        .image_container {
-            width: 100%;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+      .image_container {
+        width: 100%;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
 
-        .image_container .image_captured {
-            border: .4rem solid #0099a8;
-            width: 55%;
-            object-fit: contain;
-        }
+      .image_container .image_captured {
+        border: 0.4rem solid #0099a8;
+        width: 55%;
+        object-fit: contain;
+      }
 
-        .image_container #image2 {
-            transform: translateY(-0.3rem);
-        }
+      .image_container #image2 {
+        transform: translateY(-0.3rem);
+      }
 
-        .image_container #image3 {
-            transform: translateY(-0.6rem);
-        }
+      .image_container #image3 {
+        transform: translateY(-0.6rem);
+      }
 
-        .container_logo {
-            display: flex;
-            gap: 1rem;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
+      .container_logo {
+        display: flex;
+        gap: 1rem;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
 
-        .container_logo p {
-            font-size: 4rem;
-            font-weight: bold;
-            color: #0099a8;
-        }
+      .container_logo p {
+        font-size: 4rem;
+        font-weight: bold;
+        color: #0099a8;
+      }
 
-        .container_logo #logo_image {
-            width: 50%;
-        }
+      .container_logo #logo_image {
+        width: 50%;
+      }
 
-        .qr-container {
-            display: flex;
-            gap: 2rem;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
+      .qr-container {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
 
-        .qr-container p {
-            font-size: 2rem;
-            font-weight: bold;
-        }
+      .qr-container p {
+        font-size: 2rem;
+        font-weight: bold;
+      }
 
-        .canvasCenter {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+      .canvasCenter {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <div class="image_container" id="containerToCanvas">
-            <img id="image1" class="image_captured" alt="Captured Image 1">
-            <img id="image2" class="image_captured" alt="Captured Image 2">
-            <img id="image3" class="image_captured" alt="Captured Image 3">
-            <div class="container_logo">
-                <img src="/assets/ocasa-logo.svg" alt="ocasa-logo" id="logo_image">
-                <p>#EntregaTotal</p>
-            </div>
+      <div class="image_container" id="containerToCanvas">
+        <img id="image1" class="image_captured" alt="Captured Image 1" />
+        <img id="image2" class="image_captured" alt="Captured Image 2" />
+        <img id="image3" class="image_captured" alt="Captured Image 3" />
+        <div class="container_logo">
+          <!-- Incrustar una imagen base64 como ejemplo -->
+          <img
+            src="data:image/svg+xml;base64,PHN2ZyB4bWxuc...=="
+            alt="ocasa-logo"
+            id="logo_image"
+          />
+          <p>#EntregaTotal</p>
         </div>
-        <div class="canvasCenter" style="display: none;">
-            <div id="canvas"></div>
-        </div>
+      </div>
+      <div class="canvasCenter" style="display: none">
+        <div id="canvas"></div>
+      </div>
 
-        <div class="qr-container">
-            <div id="qrcode"></div>
-        </div>
+      <div class="qr-container">
+        <div id="qrcode"></div>
+      </div>
     </div>
 
+    <!-- Cargar librerías -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+
     <script>
-        // Recuperar las imágenes desde localStorage
-        const image1 = localStorage.getItem("capturedImage_1");
-        const image2 = localStorage.getItem("capturedImage_2");
-        const image3 = localStorage.getItem("capturedImage_3");
+      // Recuperar imágenes desde localStorage
+      const image1 = localStorage.getItem("capturedImage_1");
+      const image2 = localStorage.getItem("capturedImage_2");
+      const image3 = localStorage.getItem("capturedImage_3");
 
-        // Mostrar las imágenes en el DOM
-        if (image1) document.getElementById("image1").src = image1;
-        if (image2) document.getElementById("image2").src = image2;
-        if (image3) document.getElementById("image3").src = image3;
+      if (image1) document.getElementById("image1").src = image1;
+      if (image2) document.getElementById("image2").src = image2;
+      if (image3) document.getElementById("image3").src = image3;
 
-        const randomName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      const randomName =
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15);
 
-        // Función para procesar y subir la imagen
-        function processAndUploadImage() {
-            html2canvas(document.getElementById("containerToCanvas")).then(function (canvas) {
-                document.getElementById("canvas").appendChild(canvas);
-            });
-        }
+      // Solución 1: Asegurar que las imágenes sean del mismo origen
+      const logoImage = new Image();
+      logoImage.crossOrigin = "anonymous"; // Permitir acceso si está configurado el servidor
+      logoImage.src = "assets/ocasa-logo.svg";
+      logoImage.onload = () => {
+        document.getElementById("logo_image").src = logoImage.src;
+      };
 
-        async function uploadImage(dataURL) {
-            try {
-                const blob = dataURLtoBlob(dataURL);
-                const formData = new FormData();
-                formData.append('image', blob, randomName + ".png");
+      // Solución 4: Ocultar imágenes externas temporalmente
+      function generateQRWithHiddenImages() {
+        const logoElement = document.getElementById("logo_image");
+        logoElement.style.display = "none";
 
-                axios.post(`https://ocasa-dinamica.vercel.app/images.html`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }).then(function (response) {
-                    console.log(response.data);
-                    const url = `${location.origin}/image/download/${randomName}.png`;
-                    new QRCode(document.getElementById("qrcode"), {
-                        text: url,
-                        width: 128,
-                        height: 128,
-                        colorDark: "#000",
-                        colorLight: "#fff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                    setTimeout(() => {
-                        location.href = "index.html"
-                    }, 25000); // Espera 30 segundos antes de reiniciar el loop
-                }).catch(function (error) {
-                    console.error(error);
-                })
-                // Solo procesa la respuesta si es necesario, o ignora la respuesta:
-                // const data = await response.json();
-            } catch (error) {
-                console.error("Error al subir la imagen:", error);
+        html2canvas(document.getElementById("containerToCanvas"))
+          .then((canvas) => {
+            logoElement.style.display = ""; // Mostrar el logo de nuevo
+            const dataURL = canvas.toDataURL("image/png");
+            createQRCode(dataURL);
+          })
+          .catch((error) => console.error("Error al generar el QR:", error));
+      }
+
+      // Solución 5: Usar dom-to-image para manejar imágenes contaminadas
+      function generateQRWithDomToImage() {
+        domtoimage.toBlob(document.getElementById("containerToCanvas"))
+          .then((blob) => {
+            const dataURL = URL.createObjectURL(blob);
+            createQRCode(dataURL);
+          })
+          .catch((error) => {
+            console.error("Error al generar el QR con dom-to-image:", error);
+            // Manejo de error más detallado
+            if (error.message.includes("Network Error")) {
+              alert(
+                "No se pudo cargar un recurso. Verifica tu conexión o los permisos de CORS del servidor."
+              );
+            } else {
+              alert("Ocurrió un error inesperado.");
             }
-        }
+          });
+      }
 
+      function createQRCode(url) {
+        new QRCode(document.getElementById("qrcode"), {
+          text: url,
+          width: 128,
+          height: 128,
+          colorDark: "#000",
+          colorLight: "#fff",
+          correctLevel: QRCode.CorrectLevel.H,
+        });
+        console.log("Código QR generado con URL:", url);
+      }
 
-        function generateQR() {
-            const canvasUrl = document.querySelector("#canvas");
-
-            const dataURL = canvasUrl.querySelector("canvas").toDataURL("image/png")
-
-            try {
-                uploadImage(dataURL);
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        }
-
-        function dataURLtoBlob(dataURL) {
-            const arr = dataURL.split(',');
-            const mime = arr[0].match(/:(.*?);/)[1];
-            const bstr = atob(arr[1]);
-            let n = bstr.length;
-            const u8arr = new Uint8Array(n);
-
-            while (n--) {
-                u8arr[n] = bstr.charCodeAt(n);
-            }
-
-            return new Blob([u8arr], { type: mime });
-        }
-
-        // Ejecutar el proceso una sola vez
-        processAndUploadImage();
-        let interval = setInterval(() => {
-            const canvasUrl = document.querySelector("#canvas").querySelector("canvas");
-            if (canvasUrl) {
-                generateQR();
-                clearInterval(interval);
-            }
-        }, 1000);
+      // Ejecutar la solución deseada:
+      // generateQRWithHiddenImages(); // Usar con html2canvas
+      generateQRWithDomToImage(); // Usar con dom-to-image
     </script>
-</body>
-
+  </body>
 </html>
