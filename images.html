@@ -74,12 +74,6 @@
         font-weight: bold;
       }
 
-      .canvasCenter {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
       .download-btn {
         margin-top: 20px;
         padding: 10px 20px;
@@ -113,13 +107,10 @@
         </div>
       </div>
 
-      <div class="qr-container">
-        <div id="qrcode"></div>
-      </div>
-
-      <button class="download-btn" id="downloadImages">Descargar Imágenes</button>
+      <button class="download-btn" id="downloadHTML">Descargar como JPG</button>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
     <script>
       // Recuperar imágenes desde localStorage
       const image1 = localStorage.getItem("capturedImage_1");
@@ -130,20 +121,17 @@
       if (image2) document.getElementById("image2").src = image2;
       if (image3) document.getElementById("image3").src = image3;
 
-      // Funcionalidad para descargar las imágenes
-      document.getElementById("downloadImages").addEventListener("click", () => {
-        downloadImage(image1, "imagen1.png");
-        downloadImage(image2, "imagen2.png");
-        downloadImage(image3, "imagen3.png");
-      });
+      // Funcionalidad para capturar y descargar el HTML como JPG
+      document.getElementById("downloadHTML").addEventListener("click", () => {
+        const container = document.getElementById("containerToCanvas");
 
-      function downloadImage(dataURL, fileName) {
-        if (!dataURL) return;
-        const link = document.createElement("a");
-        link.href = dataURL;
-        link.download = fileName;
-        link.click();
-      }
+        html2canvas(container).then((canvas) => {
+          const link = document.createElement("a");
+          link.href = canvas.toDataURL("image/jpeg", 0.95); // Exportar como JPG
+          link.download = "captura.jpg";
+          link.click();
+        });
+      });
     </script>
   </body>
 </html>
