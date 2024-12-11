@@ -79,6 +79,21 @@
         justify-content: center;
         align-items: center;
       }
+
+      .download-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background-color: #0099a8;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .download-btn:hover {
+        background-color: #007b89;
+      }
     </style>
   </head>
 
@@ -89,7 +104,6 @@
         <img id="image2" class="image_captured" alt="Captured Image 2" />
         <img id="image3" class="image_captured" alt="Captured Image 3" />
         <div class="container_logo">
-          <!-- Incrustar una imagen base64 como ejemplo -->
           <img
             src="data:image/svg+xml;base64,PHN2ZyB4bWxuc...=="
             alt="ocasa-logo"
@@ -98,20 +112,13 @@
           <p>#EntregaTotal</p>
         </div>
       </div>
-      <div class="canvasCenter" style="display: none">
-        <div id="canvas"></div>
-      </div>
 
       <div class="qr-container">
         <div id="qrcode"></div>
       </div>
-    </div>
 
-    <!-- Cargar librerías -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+      <button class="download-btn" id="downloadImages">Descargar Imágenes</button>
+    </div>
 
     <script>
       // Recuperar imágenes desde localStorage
@@ -123,63 +130,20 @@
       if (image2) document.getElementById("image2").src = image2;
       if (image3) document.getElementById("image3").src = image3;
 
-      const randomName =
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15);
+      // Funcionalidad para descargar las imágenes
+      document.getElementById("downloadImages").addEventListener("click", () => {
+        downloadImage(image1, "imagen1.png");
+        downloadImage(image2, "imagen2.png");
+        downloadImage(image3, "imagen3.png");
+      });
 
-      // Solución 1: Asegurar que las imágenes sean del mismo origen
-      const logoImage = new Image();
-      logoImage.crossOrigin = "anonymous"; // Permitir acceso si está configurado el servidor
-      logoImage.src = "assets/ocasa-logo.svg";
-      logoImage.onload = () => {
-        document.getElementById("logo_image").src = logoImage.src;
-      };
-
-      // Solución 4: Ocultar imágenes externas temporalmente
-      function generateQRWithHiddenImages() {
-        const logoElement = document.getElementById("logo_image");
-        logoElement.style.display = "none";
-
-        html2canvas(document.getElementById("containerToCanvas"))
-          .then((canvas) => {
-            logoElement.style.display = ""; // Mostrar el logo de nuevo
-            const dataURL = canvas.toDataURL("image/png");
-            createQRCode(dataURL);
-          })
-          .catch((error) => console.error("Error al generar el QR:", error));
+      function downloadImage(dataURL, fileName) {
+        if (!dataURL) return;
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = fileName;
+        link.click();
       }
-
-      // Solución 5: Usar dom-to-image para manejar imágenes contaminadas
-      function generateQRWithHtml2Canvas() {
-        html2canvas(document.getElementById("containerToCanvas"))
-          .then(function (canvas) {
-            const dataURL = canvas.toDataURL("image/png");
-            createQRCode(dataURL);
-          })
-          .catch(function (error) {
-            console.error("Error al generar el QR con html2canvas:", error);
-            alert(
-              `Hubo un problema al generar el QR con html2canvas. Verifica que el contenido en el contenedor sea accesible.\nError: ${error.message}`
-            );
-          });
-      }
-
-      function createQRCode(url) {
-        new QRCode(document.getElementById("qrcode"), {
-          text: url,
-          width: 128,
-          height: 128,
-          colorDark: "#000",
-          colorLight: "#fff",
-          correctLevel: QRCode.CorrectLevel.H,
-        });
-        console.log("Código QR generado con URL:", url);
-      }
-
-      // Ejecutar la solución deseada:
-    //   generateQRWithHiddenImages(); // Usar con html2canvas
-      //   generateQRWithDomToImage(); // Usar con dom-to-image
-      generateQRWithHtml2Canvas();
     </script>
   </body>
 </html>
