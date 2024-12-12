@@ -18,7 +18,11 @@ let isCaptured = false;
 
 // Carga del modelo BodyPix
 async function loadBodyPix() {
-  const net = await bodyPix.load();
+  const net = await bodyPix.load({
+    architecture: "ResNet50", // Modelo más preciso (opcional)
+    outputStride: 16,
+    segmentationThreshold: 0.7, // Aumenta el umbral de confianza (por defecto 0.5)
+  });
 
   // Configuración del video
   navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
@@ -37,56 +41,34 @@ async function loadBodyPix() {
 async function segmentPerson(net) {
   const segmentation = await net.segmentPerson(video);
 
-  // Filtrar para encontrar la persona más cercana al centro
-  if (segmentation.allPoses.length > 0) {
-    const closestPerson = segmentation.allPoses.reduce((closest, pose) => {
-      const personCenterX = (pose.boundingBox.minX + pose.boundingBox.maxX) / 2;
-      const personCenterY = (pose.boundingBox.minY + pose.boundingBox.maxY) / 2;
+  const personDetected = segmentation.allPoses.length > 0;
 
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
+  if (personDetected) {
+    canCapture = true;
+    capture_video.play();
+    const mask = bodyPix.toMask(segmentation);
+    ctx.putImageData(mask, 0, 0);
 
-      const distanceToCenter = Math.sqrt(
-        Math.pow(personCenterX - centerX, 2) +
-          Math.pow(personCenterY - centerY, 2)
-      );
+    ctx.globalCompositeOperation = "source-in";
+    const backgroundImage = document.getElementById("background");
+    backgroundImage.style.filter = "blur(5px)";
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-      if (!closest || distanceToCenter < closest.distance) {
-        return { pose, distance: distanceToCenter };
-      }
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      return closest;
-    }, null);
+    // Dibujar la imagen de corredores, cambiando según el frameCount
+    ctx.globalCompositeOperation = "source-over";
+    const corredores = corredoresImages[frameCount % corredoresImages.length];
+    ctx.drawImage(
+      corredores,
+      canvas.width - corredores.width / 1.6,
+      canvas.height - corredores.height / 1.5,
+      corredores.width / 1.5,
+      corredores.height / 1.5
+    );
 
-    // Usar únicamente la persona más cercana
-    if (closestPerson) {
-      const mask = bodyPix.toMask(segmentation, {
-        label: closestPerson.pose.id, // Mantén solo a esa persona
-      });
-
-      ctx.putImageData(mask, 0, 0);
-
-      // Continúa con el resto del procesamiento
-      ctx.globalCompositeOperation = "source-in";
-      const backgroundImage = document.getElementById("background");
-      backgroundImage.style.filter = "blur(5px)";
-      ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-
-      ctx.globalCompositeOperation = "destination-over";
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      ctx.globalCompositeOperation = "source-over";
-      const corredores = corredoresImages[frameCount % corredoresImages.length];
-      ctx.drawImage(
-        corredores,
-        canvas.width - corredores.width / 1.6,
-        canvas.height - corredores.height / 1.5,
-        corredores.width / 1.5,
-        corredores.height / 1.5
-      );
-
-      requestAnimationFrame(() => segmentPerson(net));
-    }
+    requestAnimationFrame(() => segmentPerson(net));
   }
 }
 
