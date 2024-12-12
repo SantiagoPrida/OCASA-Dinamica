@@ -102,8 +102,6 @@
           <p>#EntregaTotal</p>
         </div>
       </div>
-
-      <button class="download-btn" id="downloadHTML">Descargar como JPG</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
@@ -117,8 +115,8 @@
       if (image2) document.getElementById("image2").src = image2;
       if (image3) document.getElementById("image3").src = image3;
 
-      // Funcionalidad para capturar y descargar el HTML como JPG
-      document.getElementById("downloadHTML").addEventListener("click", () => {
+      // Función para capturar y descargar el HTML como JPG
+      function downloadImage() {
         const container = document.getElementById("containerToCanvas");
 
         html2canvas(container).then((canvas) => {
@@ -127,11 +125,33 @@
           link.download = "captura.jpg";
           link.click();
         });
-      });
+      }
 
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 15000); // 15000 ms = 15 segundos
+      // Ejecutar automáticamente la descarga al cargar la página
+      window.onload = () => {
+        downloadImage();
+
+        // Esperar 15 segundos y redirigir al index.html
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 15000); // 15 segundos
+      };
+
+      // // Funcionalidad para capturar y descargar el HTML como JPG
+      // document.getElementById("downloadHTML").addEventListener("click", () => {
+      //   const container = document.getElementById("containerToCanvas");
+
+      //   html2canvas(container).then((canvas) => {
+      //     const link = document.createElement("a");
+      //     link.href = canvas.toDataURL("image/jpeg", 0.95); // Exportar como JPG
+      //     link.download = "captura.jpg";
+      //     link.click();
+      //   });
+      // });
+
+      // setTimeout(() => {
+      //   window.location.href = "index.html";
+      // }, 15000); // 15000 ms = 15 segundos
     </script>
   </body>
 </html>
