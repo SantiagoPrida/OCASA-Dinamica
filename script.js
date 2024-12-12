@@ -18,11 +18,7 @@ let isCaptured = false;
 
 // Carga del modelo BodyPix
 async function loadBodyPix() {
-  const net = await bodyPix.load({
-    architecture: "ResNet50", // Modelo más preciso (opcional)
-    outputStride: 16,
-    segmentationThreshold: 0.7, // Aumenta el umbral de confianza (por defecto 0.5)
-  });
+  const net = await bodyPix.load();
 
   // Configuración del video
   navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
