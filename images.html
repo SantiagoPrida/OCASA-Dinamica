@@ -98,11 +98,7 @@
         <img id="image2" class="image_captured" alt="Captured Image 2" />
         <img id="image3" class="image_captured" alt="Captured Image 3" />
         <div class="container_logo">
-          <img
-            src="assets/ocasa-logo.svg"
-            alt="ocasa-logo"
-            id="logo_image"
-          />
+          <img src="assets/ocasa-logo.svg" alt="ocasa-logo" id="logo_image" />
           <p>#EntregaTotal</p>
         </div>
       </div>
@@ -132,6 +128,10 @@
           link.click();
         });
       });
+
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 15000); // 15000 ms = 15 segundos
     </script>
   </body>
 </html>
